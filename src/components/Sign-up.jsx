@@ -9,6 +9,7 @@ const SignUpForm = () => {
     const [password, setPassword] = useState('');
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const auth = useContext(AuthContext);
 
@@ -22,6 +23,7 @@ const SignUpForm = () => {
         }
 
         try {
+            setIsLoading(true);
             const response = await fetch(import.meta.env.VITE_REACT_APP_BACKEND_URL + '/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -30,6 +32,7 @@ const SignUpForm = () => {
             const responseData = await response.json();
 
             if (!response.ok) {
+                setIsLoading(false);
                 throw new Error(responseData.msg);
             }
 
@@ -37,10 +40,12 @@ const SignUpForm = () => {
             console.log('Registration successful:', responseData);
 
             setError(null);
+            setIsLoading(false);
             navigate('/setupProfile1/' + responseData.user.userID)
         } catch (err) {
             // console.error('Error registering user:', err);
             setError(err.message)
+            setIsLoading(false);
         }
     };
     return (
@@ -56,6 +61,7 @@ const SignUpForm = () => {
                     <div className=' h-screen'>
                         <h1 className='font-bold text-4xl max-md:mt-8 max-sm:text-3xl'>Sign up to Dribble</h1>
                         {error && <p className="text-red-500 mt-4">{error}</p>}
+                        {isLoading && <img src="/images/loading-circle.svg" alt="Loading" width={40} height={40} className="mt-4" />}
                         <div className="flex mb-4 mt-12">
                             <div className="w-1/2 mr-2">
                                 <label htmlFor="name" className="block text-black font-bold mb-2">
